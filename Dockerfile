@@ -14,6 +14,8 @@ RUN mvn -B -q -DskipTests package
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 ENV TZ=Asia/Shanghai
+# SQLite 与上传目录（全新文件系统下需预先创建，否则 SQLite 无法打开 data/booking.db）
+RUN mkdir -p /app/data /app/uploads
 COPY --from=build /build/target/booking-backend-0.0.1-SNAPSHOT.jar app.jar
 EXPOSE 8993
 ENTRYPOINT ["java", "-jar", "app.jar"]
