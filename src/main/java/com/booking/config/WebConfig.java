@@ -41,10 +41,14 @@ public class WebConfig implements WebMvcConfigurer {
                 .maxAge(3600);
     }
 
-    /** 上传图片静态资源映射：/uploads/** -> 项目目录 uploads/ */
+    /** 上传图片静态资源映射：/uploads/** -> 上传目录（可用 UPLOAD_DIR 环境变量指向挂载盘，默认项目目录 uploads/） */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        String uploadPath = java.nio.file.Paths.get("uploads").toAbsolutePath().normalize().toUri().toString();
+        String uploadRoot = System.getenv("UPLOAD_DIR");
+        java.nio.file.Path root = (uploadRoot != null && !uploadRoot.isBlank())
+                ? java.nio.file.Paths.get(uploadRoot)
+                : java.nio.file.Paths.get("uploads");
+        String uploadPath = root.toAbsolutePath().normalize().toUri().toString();
         if (!uploadPath.endsWith("/")) uploadPath += "/";
         registry.addResourceHandler("/uploads/**").addResourceLocations(uploadPath);
     }

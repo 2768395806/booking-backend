@@ -58,7 +58,11 @@ public class PlatformUploadController {
 
         try {
             String dateDir = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-            Path dir = Paths.get("uploads", dateDir).toAbsolutePath();
+            String uploadRoot = System.getenv("UPLOAD_DIR");
+            Path base = (uploadRoot != null && !uploadRoot.isBlank())
+                    ? Paths.get(uploadRoot)
+                    : Paths.get("uploads");
+            Path dir = base.resolve(dateDir).toAbsolutePath();
             Files.createDirectories(dir);
             String fileName = UUID.randomUUID().toString().replace("-", "") + "." + ext;
             Path target = dir.resolve(fileName);

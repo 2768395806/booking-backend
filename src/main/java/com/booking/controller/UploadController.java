@@ -54,9 +54,13 @@ public class UploadController {
         }
 
         try {
-            // 按日期分目录存储：uploads/yyyyMMdd/uuid.ext
+            // 按日期分目录存储：uploads/yyyyMMdd/uuid.ext（UPLOAD_DIR 可指向挂载盘持久化）
             String dateDir = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-            Path dir = Paths.get("uploads", dateDir).toAbsolutePath();
+            String uploadRoot = System.getenv("UPLOAD_DIR");
+            Path base = (uploadRoot != null && !uploadRoot.isBlank())
+                    ? Paths.get(uploadRoot)
+                    : Paths.get("uploads");
+            Path dir = base.resolve(dateDir).toAbsolutePath();
             Files.createDirectories(dir);
             String fileName = UUID.randomUUID().toString().replace("-", "") + "." + ext;
             Path target = dir.resolve(fileName);
